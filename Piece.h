@@ -3,7 +3,7 @@
 #define PIECE_H
 
 
-// Move function takes an order like (-2, 5) that'll be used later for moving objects inside our list
+
 struct Move {
 	int upDown, leftRight;
 	bool operator == (int x[2]) {

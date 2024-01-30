@@ -15,13 +15,11 @@ void test() {
 			board[i]->insert(new Piece(i, j, 1, ""));
 			(*board[i])[j] = nullptr;
 		}
-	}
-
-
-
+	}	
 
 	(*board[4])[5] = (new King(4, 5, 1, "King"));
-
+	
+	// inspect the line 27 in order to understand the design of the program
 	// this is our move mechanism !
 	Piece* p = (*board[4])[5];
 	(*board[4])[5] = nullptr;
@@ -43,8 +41,6 @@ void test() {
 int main() {
 	test();
 	// write a code that prints all the pieces on the board
-	for
-
 	return 0;
 }
 
