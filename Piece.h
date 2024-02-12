@@ -5,9 +5,11 @@
 
 
 struct Move {
+public:
 	int upDown, leftRight;
-	bool operator == (int x[2]) {
-		return this->upDown == x[0] && this->leftRight == x[1]; // error occurs here
+	// We use this operator to compare the moves inside piece's isInMoveSet
+	bool operator == (Move m) {
+		return this->upDown == m.upDown && this->leftRight == m.leftRight; // error occurs here
 	}
 	Move(int x, int y) {
 		this->upDown = x;
@@ -36,16 +38,47 @@ public:
 
 class King : public Piece {
 public:
-	King(int, int, bool, const string&);
-	//bool isCastle(int, int);
+	bool isMoved;
 	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
-	//bool isRookMoved(int, int, LinkedList<LinkedList<Piece*>*>);
-	//bool dumbMove(int, int, LinkedList<LinkedList<Piece*>*>);
+	bool isCastle(int, int);
+	bool isRookMoved(int, int, LinkedList<LinkedList<Piece*>*>);
+	bool isDumbMove(int, int, LinkedList<LinkedList<Piece*>*>);
+	King(int, int, bool, const string&);
 };
 
-//class Rook : public Piece {
-//public:
-//	bool isMoved;
-//	Rook(int, int, bool, const string&);
-//};
+class Rook : public Piece {
+public:
+	bool isMoved;
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+	Rook(int, int, bool, const string&);
+};
+
+class Knight :public Piece {
+public:
+	Knight(int, int, bool, const string&);
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+};
+
+class Bishop :public Piece {
+public:
+	Bishop(int, int, bool, const string&);
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+};
+
+class Queen :public Piece {
+public:
+	Queen(int, int, bool, const string&);
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+};
+
+class Pawn :public Piece {
+public:
+	bool isMoved;
+	Pawn(int, int, bool, const string&);
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+	bool isInterrupted(int, int, LinkedList<LinkedList<Piece*>*>);
+	bool crossMove(int, int, LinkedList<LinkedList<Piece*>*>);
+	void convert(int, int, LinkedList<LinkedList<Piece*>*>);
+	bool enPassant(int, int, LinkedList<LinkedList<Piece*>*>);
+};
 #endif

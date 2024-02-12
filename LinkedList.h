@@ -1,6 +1,7 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 #include "Node.h"
+#include <stdexcept>
 
 template <typename T>
 class LinkedList {
@@ -37,9 +38,14 @@ public:
 				prev = iterator;
 				iterator = iterator->next;
 			}
+			if(iterator->next != nullptr) {
 			prev->next = iterator->next;
+			prev = nullptr;
+			}
+			else {
+				prev->next = nullptr;
+			}
 		}
-
 		delete iterator;
 		iterator = nullptr;
 		this->length -= 1;
@@ -48,7 +54,7 @@ public:
 
 	T& operator[](int x) {
 		if (x < 0 || x >= this->length) {
-			throw std::runtime_error("Index out of Boundary");
+			throw runtime_error("Index out of Boundary");
 		}
 
 		Node<T>* iterator = this->head; // error "Unhandled Exception" occurs here
@@ -58,6 +64,8 @@ public:
 
 		return iterator->data; // Assuming Node has a 'data' member of type T
 	}
+
+
 
 
 	LinkedList() {
