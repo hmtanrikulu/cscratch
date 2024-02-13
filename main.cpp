@@ -1,4 +1,6 @@
 #include "Piece.h"
+#include "Game.h"
+
 
 void test() {
 	// Creates the board.
@@ -38,14 +40,14 @@ void test() {
 	(*board[0])[0] = (new Knight(0, 0, 1, "Knight"));
 	cout << (*board[0])[0]->name;
 	(*board[0])[0]->moveCheck(1, 2, board);
-
 }
 
 
 //last error: having trouble because of dangling pointers
 // trying to delete them before return 0 using destructors properly.
 int main() {
-	test();
+	Game g1;
+	g1.play();
 	cout << "good text dawg";
 	return 0;
 }

@@ -225,6 +225,7 @@ bool King::isRookMoved(int r2, int c2, LinkedList<LinkedList<Piece*>*> board) {
 		}
 		return false;
 	}
+	return true;
 }
 
 bool King::isCastle(int r2, int c2) {
