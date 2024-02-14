@@ -43,8 +43,7 @@ void test() {
 }
 
 
-//last error: having trouble because of dangling pointers
-// trying to delete them before return 0 using destructors properly.
+// alt taraf this->isWhite == 0 yani black ama white olmasý lazým print den bul.
 int main() {
 	Game g1;
 	g1.play();

@@ -17,11 +17,11 @@ bool Piece::moveCheck(int r2, int c2, LinkedList<LinkedList<Piece*>*> board) {
 	return true;
 }
 
-bool Piece::isInMoveSet(int r2, int c2) {
+bool Piece::isInMoveSet(int r2, int c2) { // flag
 	int r1 = this->row, c1 = this->col;
+	Move m(!this->isWhite ? (r1 - r2) : (r2 - r1), (c2 - c1));
 	for (int i = 0; i < this->moveSet.length; i++) {
-		Move m((r2 - r1), (c2 - c1));
-		if (this->moveSet[i] == m) return true;
+	if (this->moveSet[i] == m) return true;
 	}	
 	return false;
 }

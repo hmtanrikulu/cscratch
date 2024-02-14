@@ -37,11 +37,13 @@ void Game::checkTheKing() {
 }
 
 void Game:: print() {
+
 	for (int i = 0; i < 8; i++) {
+		cout << 8 - i<< "|" << " ";
 		for (int j = 0; j < 8; j++) {
 			Piece* piece = (*this->board[i])[j];
 			if (piece == nullptr) {
-				std::cout << ". "; // Print a dot for empty squares
+				cout << ". ";
 			}
 			else {
 				char pieceChar = ' '; // Placeholder for the piece character
@@ -58,11 +60,13 @@ void Game:: print() {
 					pieceChar = tolower(pieceChar);
 				}
 
-				std::cout << pieceChar << ' ';
+				cout << pieceChar << ' ';
 			}
 		}
-		std::cout << std::endl; // New line at the end of each row
+		cout << endl;
 	}
+	cout << " "<< " " << " a b c d e f g h\n";
+
 }
 
 //void Game::initilizeTheBoard() {
@@ -120,12 +124,12 @@ void Game::play() {
 
 
 		cout << "make your move " << turnIndicator << endl;
-		cout << "(ex. 00to40)" << endl;
+		cout << "(ex. 2ato4a)" << endl;
 		cin >> moveStr;
 		for (int i = 0; i < moveStr.length(); i++) {
 			userPrompt.insert(moveStr[i]);
 		}
-		int r1 = '7' - userPrompt[0], c1 = userPrompt[1] - '0', r2 = '7' - userPrompt[4], c2 = userPrompt[5] - '0';
+		int r1 = '8' - userPrompt[0], c1 = userPrompt[1] - 'a', r2 = '8' - userPrompt[4], c2 = userPrompt[5] - 'a'; //	1a == 00, 8h == 77	'0' = 48				istenen 11 == 00
 
 		if ((*this->board[r1])[c1]->moveCheck(r2, c2, this->board)) {
 			(*this->board[r2])[c2] = (*this->board[r1])[c1];
