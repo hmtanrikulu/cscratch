@@ -10,31 +10,58 @@ void Game::checkTheKing() {
 	// Game status part
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if ((*this->board[i])[j]->name == "King") {
-				King* tmp = dynamic_cast<King*>((*this->board[i])[j]);
-				if (tmp != nullptr) {
-					for (int i = 0; i < tmp->moveSet.length; i++) {
-						int r2 = tmp->moveSet[i].upDown, c2 = tmp->moveSet[i].leftRight;
-
-
-
-						if (tmp->isDumbMove(r2, c2, this->board) && tmp->isDumbMove(tmp->row, tmp->col, this->board)) {
-							if (tmp->isWhite) cout << "black player won !";
-							else cout << "white player won";
-							this->finish = 1;
-
-						}
-						else if (tmp->isDumbMove(tmp->row, tmp->col, this->board)) {
-							if (tmp->isDumbMove(r2, c2, this->board)) {
-								cout << "check";
-
+			if ((*this->board[i])[j] != nullptr) {
+				if ((*this->board[i])[j]->name == "King") {
+					King* tmp = dynamic_cast<King*>((*this->board[i])[j]);
+					if (tmp != nullptr) {
+						for (int m = 0; m < tmp->moveSet.length; m++) {
+							int r2 = tmp->moveSet[m].upDown, c2 = tmp->moveSet[m].leftRight;
+							// This one is checkmate part
+							if (tmp->isDumbMove(r2, c2, this->board) && tmp->isDumbMove(tmp->row, tmp->col, this->board)) {
+								if (tmp->isWhite) cout << "black player won !";
+								else cout << "white player won";
+								this->finish = 1;
 							}
-
+							// Check part
+							else if (tmp->isDumbMove(tmp->row, tmp->col, this->board)) {
+								if (tmp->isDumbMove(r2, c2, this->board)) {
+									cout << "check";
+								}
+							}
 						}
 					}
 				}
 			}
 		}
+	}
+}
+
+void Game:: print() {
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			Piece* piece = (*this->board[i])[j];
+			if (piece == nullptr) {
+				std::cout << ". "; // Print a dot for empty squares
+			}
+			else {
+				char pieceChar = ' '; // Placeholder for the piece character
+				// Determine the piece type and assign the corresponding character
+				if (piece->name == "Pawn") pieceChar = 'P';
+				else if (piece->name == "Rook") pieceChar = 'R';
+				else if (piece->name == "Knight") pieceChar = 'N'; // 'K' is for King, so 'N' for kNight
+				else if (piece->name == "Bishop") pieceChar = 'B';
+				else if (piece->name == "Queen") pieceChar = 'Q';
+				else if (piece->name == "King") pieceChar = 'K';
+
+				// Convert to lowercase for black pieces
+				if (!piece->isWhite) {
+					pieceChar = tolower(pieceChar);
+				}
+
+				std::cout << pieceChar << ' ';
+			}
+		}
+		std::cout << std::endl; // New line at the end of each row
 	}
 }
 
@@ -84,25 +111,35 @@ void Game::play() {
 	(*this->board[7])[7] = new Rook(7, 7, 0, "Rook");
 
 	while (this->finish != 1) {
+		print();
 		LinkedList<char> userPrompt;
-		string turnIndicator = "White", moveStr;
-		if (this->turn == 0) turnIndicator = "Black";
+		string turnIndicator, moveStr;
+
+		if (this->turn == 1) turnIndicator = "White";
+		else turnIndicator = "Black";
+
+
 		cout << "make your move " << turnIndicator << endl;
 		cout << "(ex. 00to40)" << endl;
 		cin >> moveStr;
 		for (int i = 0; i < moveStr.length(); i++) {
 			userPrompt.insert(moveStr[i]);
 		}
-		int r1 = userPrompt[0] - '0', c1 = userPrompt[1] - '0', r2 = userPrompt[4] - '0', c2 = userPrompt[5] - '0';
+		int r1 = '7' - userPrompt[0], c1 = userPrompt[1] - '0', r2 = '7' - userPrompt[4], c2 = userPrompt[5] - '0';
+
 		if ((*this->board[r1])[c1]->moveCheck(r2, c2, this->board)) {
 			(*this->board[r2])[c2] = (*this->board[r1])[c1];
 			(*this->board[r1])[c1] = nullptr;
-			cout << "you made your move !";
 		}
+		else if (!(*this->board[r1])[c1]->moveCheck(r2, c2, this->board)) {
+			cout << "invalid input try again!" << endl;
+			continue;
+		}
+			cout << "you made your move " << turnIndicator << "\n\n";
 		checkTheKing();
-
-
+		this->turn = !this->turn;
 	}
+	cout << "Game Over";
 }
 
 	// delete this !

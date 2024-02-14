@@ -159,7 +159,6 @@ bool King::isDumbMove(int r2, int c2, LinkedList<LinkedList<Piece*>*> board) {
 					tmpR = tmp->row + tmp->moveSet[iterator].upDown;
 					tmpC = tmp->col + tmp->moveSet[iterator].leftRight;
 					if ((tmpR == r2) && (tmpC == c2)) {
-						cout << "dumbMove!\n";
 						return true;
 					}
 					iterator++;

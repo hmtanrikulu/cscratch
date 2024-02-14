@@ -7,6 +7,7 @@ class Game {
 public:
 	void play();
 	void checkTheKing();
+	void print();
 	//void initilizeTheBoard();
 	Game();
 };

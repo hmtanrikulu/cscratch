@@ -1,6 +1,4 @@
 ﻿  Game.cpp
-C:\Users\hmert\source\repos\scratch\scratch\Game.cpp(60,21): warning C4018: '<': signed/unsigned mismatch
-  Game.h
-  Generating Code...
+C:\Users\hmert\source\repos\scratch\scratch\Game.cpp(125,21): warning C4018: '<': signed/unsigned mismatch
 Debug\Game.obj : warning LNK4042: object specified more than once; extras ignored
   scratch.vcxproj -> C:\Users\hmert\source\repos\scratch\Debug\scratch.exe
