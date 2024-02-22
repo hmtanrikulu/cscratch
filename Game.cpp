@@ -3,83 +3,98 @@
 Game::Game() {
 	this->turn = 1;
 	this->finish = 0;
+	this->check = 0;
+	this->escape = 0;
 }
 
-// %50 checkmate part is done complete the check part!
-void Game::checkTheKing() {
-	// Game status part
+bool Game::isKingInCheck() {
+	King* king = nullptr;
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if ((*this->board[i])[j] != nullptr) {
-				if ((*this->board[i])[j]->name == "King") {
-					King* tmp = dynamic_cast<King*>((*this->board[i])[j]);
-					if (tmp != nullptr) {
-						for (int m = 0; m < tmp->moveSet.length; m++) {
-							int r2 = tmp->moveSet[m].upDown, c2 = tmp->moveSet[m].leftRight;
-							// This one is checkmate part
-							if (tmp->isDumbMove(r2, c2, this->board) && tmp->isDumbMove(tmp->row, tmp->col, this->board)) {
-								if (tmp->isWhite) cout << "black player won !";
-								else cout << "white player won";
-								this->finish = 1;
-							}
-							// Check part
-							else if (tmp->isDumbMove(tmp->row, tmp->col, this->board)) {
-								if (tmp->isDumbMove(r2, c2, this->board)) {
-									cout << "check";
-								}
-							}
+			Piece* piece = (*this->board[i])[j];
+			if (piece != nullptr && piece->name == "King" && piece->isWhite == !this->turn) {
+				King* tmp = dynamic_cast<King*>(piece);
+				if (tmp && tmp->isDumbMove(tmp->row, tmp->col, this->board)) {
+					king = tmp;
+				}
+			}
+		}
+	}
+	if (king == nullptr) return false;
+	else return true;
+}
+
+
+bool Game::moveResolvesTheCheck(int r1, int c1, int r2, int c2) {
+	Piece* tempDest = (*this->board[r2])[c2]; // Temporarily store the destination piece
+	Piece* tempSrc = (*this->board[r1])[c1]; // Temporarily store the source piece
+
+	// Simulate the move
+	(*this->board[r2])[c2] = tempSrc;
+	(*this->board[r1])[c1] = nullptr;
+	if (tempSrc) {
+		tempSrc->row = r2;
+		tempSrc->col = c2;
+	}
+
+	// Check if the move resolves the check
+	bool checkResolved = !isKingInCheck();
+
+	// Immediately revert the move
+	(*this->board[r1])[c1] = tempSrc;
+	(*this->board[r2])[c2] = tempDest;
+	if (tempSrc) {
+		tempSrc->row = r1;
+		tempSrc->col = c1;
+	}
+
+	return checkResolved;
+}
+
+
+void Game::gameStatus() {
+	King* king = nullptr;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			Piece* piece = (*this->board[i])[j];
+			if (piece != nullptr && piece->name == "King") {
+				King* tmp = dynamic_cast<King*>(piece);
+				if (tmp && tmp->isDumbMove(tmp->row, tmp->col, this->board)) {
+					king = tmp;
+					this->check = true;
+				}
+			}
+		}
+	}
+
+	if (king != nullptr) {
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				Piece* piece = (*this->board[i])[j];
+				if (piece != nullptr && piece->isWhite == king->isWhite) {
+					for (int m = 0; m < piece->moveSet.length; m++) {
+						int saveMoveR = piece->moveSet[m].upDown + piece->row, saveMoveC = piece->moveSet[m].leftRight + piece->col;
+						if (piece->moveCheck(saveMoveR, saveMoveC, this->board) && moveResolvesTheCheck(i, j, saveMoveR, saveMoveC)) {
+							this->escape = true;
+							break;
 						}
 					}
 				}
 			}
 		}
-	}
-}
 
-void Game:: print() {
-
-	for (int i = 0; i < 8; i++) {
-		cout << 8 - i<< "|" << " ";
-		for (int j = 0; j < 8; j++) {
-			Piece* piece = (*this->board[i])[j];
-			if (piece == nullptr) {
-				cout << ". ";
-			}
-			else {
-				char pieceChar = ' '; // Placeholder for the piece character
-				// Determine the piece type and assign the corresponding character
-				if (piece->name == "Pawn") pieceChar = 'P';
-				else if (piece->name == "Rook") pieceChar = 'R';
-				else if (piece->name == "Knight") pieceChar = 'N'; // 'K' is for King, so 'N' for kNight
-				else if (piece->name == "Bishop") pieceChar = 'B';
-				else if (piece->name == "Queen") pieceChar = 'Q';
-				else if (piece->name == "King") pieceChar = 'K';
-
-				// Convert to lowercase for black pieces
-				if (!piece->isWhite) {
-					pieceChar = tolower(pieceChar);
-				}
-
-				cout << pieceChar << ' ';
-			}
+		if (this->escape == 0 && this->check == 1) {
+			cout << king->isWhite ? "\nBlack player won! GG!\n" : "\nWhite player won! GG!\n";
+			this->finish = 1;
 		}
-		cout << endl;
+		else {
+			cout << "\n king is checked!\n";
+		}
 	}
-	cout << " "<< " " << " a b c d e f g h\n";
-
 }
 
-//void Game::initilizeTheBoard() {
-//}
-
-
-// Don't initilize the board every turn make necessary adjustments !
-// Add the moveCheck when a piece takes the other part !
 
 void Game::play() {
-	bool currTurn = this->turn;
-
-	// Creates the empty board
 	for (int i = 0; i < 8; i++) {
 		LinkedList<Piece*>* newElement = new LinkedList<Piece*>;
 		this->board.insert(newElement);
@@ -90,100 +105,90 @@ void Game::play() {
 			(*this->board[i])[j] = nullptr;
 		}
 	}
-	// Initialize the board
-	(*this->board[0])[0] = new Rook(0, 0, 1, "Rook");
-	(*this->board[0])[1] = new Knight(0, 1, 1, "Knight");
-	(*this->board[0])[2] = new Bishop(0, 2, 1, "Bishop");
-	(*this->board[0])[3] = new Queen(0, 3, 1, "Queen");
-	(*this->board[0])[4] = new King(0, 4, 1, "King");
-	(*this->board[0])[5] = new Bishop(0, 5, 1, "Bishop");
-	(*this->board[0])[6] = new Knight(0, 6, 1, "Knight");
-	(*this->board[0])[7] = new Rook(0, 7, 1, "Rook");
+	(*this->board[0])[0] = new Rook(0, 0, 0, "Rook");
+	(*this->board[0])[1] = new Knight(0, 1, 0, "Knight");
+	(*this->board[0])[2] = new Bishop(0, 2, 0, "Bishop");
+	(*this->board[0])[3] = new Queen(0, 3, 0, "Queen");
+	(*this->board[0])[4] = new King(0, 4, 0, "King");
+	(*this->board[0])[5] = new Bishop(0, 5, 0, "Bishop");
+	(*this->board[0])[6] = new Knight(0, 6, 0, "Knight");
+	(*this->board[0])[7] = new Rook(0, 7, 0, "Rook");
 	for (int i = 0; i < 8; i++) {
-		(*this->board[1])[i] = new Pawn(1, i, 1, "Pawn");
+		(*this->board[1])[i] = new Pawn(1, i, 0, "Pawn");
 	}
 	for (int i = 0; i < 8; i++) {
-		(*this->board[6])[i] = new Pawn(6, i, 0, "Pawn");
+		(*this->board[6])[i] = new Pawn(6, i, 1, "Pawn");
 	}
-	(*this->board[7])[0] = new Rook(7, 0, 0, "Rook");
-	(*this->board[7])[1] = new Knight(7, 1, 0, "Knight");
-	(*this->board[7])[2] = new Bishop(7, 2, 0, "Bishop");
-	(*this->board[7])[3] = new Queen(7, 3, 0, "Queen");
-	(*this->board[7])[4] = new King(7, 4, 0, "King");
-	(*this->board[7])[5] = new Bishop(7, 5, 0, "Bishop");
-	(*this->board[7])[6] = new Knight(7, 6, 0, "Knight");
-	(*this->board[7])[7] = new Rook(7, 7, 0, "Rook");
+	(*this->board[7])[0] = new Rook(7, 0, 1, "Rook");
+	(*this->board[7])[1] = new Knight(7, 1, 1, "Knight");
+	(*this->board[7])[2] = new Bishop(7, 2, 1, "Bishop");
+	(*this->board[7])[3] = new Queen(7, 3, 1, "Queen");
+	(*this->board[7])[4] = new King(7, 4, 1, "King");
+	(*this->board[7])[5] = new Bishop(7, 5, 1, "Bishop");
+	(*this->board[7])[6] = new Knight(7, 6, 1, "Knight");
+	(*this->board[7])[7] = new Rook(7, 7, 1, "Rook");
 
-	while (this->finish != 1) {
+	while (!this->finish) {
 		print();
-		LinkedList<char> userPrompt;
-		string turnIndicator, moveStr;
-
-		if (this->turn == 1) turnIndicator = "White";
-		else turnIndicator = "Black";
-
-
-		cout << "make your move " << turnIndicator << endl;
-		cout << "(ex. 2ato4a)" << endl;
+		string turnIndicator = this->turn ? "White" : "Black";
+		string moveStr;
+		cout << "Make your move " << (this->turn ? "White" : "Black") << "(ex.a2 to a4) : ";
 		cin >> moveStr;
-		for (int i = 0; i < moveStr.length(); i++) {
-			userPrompt.insert(moveStr[i]);
-		}
-		int r1 = '8' - userPrompt[0], c1 = userPrompt[1] - 'a', r2 = '8' - userPrompt[4], c2 = userPrompt[5] - 'a'; //	1a == 00, 8h == 77	'0' = 48				istenen 11 == 00
+		int r1 = '8' - moveStr[1], c1 = moveStr[0] - 'a';
+		int r2 = '8' - moveStr[5], c2 = moveStr[4] - 'a';
 
-		if ((*this->board[r1])[c1]->moveCheck(r2, c2, this->board)) {
+
+		// Escape movesda bu move var mý ???
+		if (this->escape == 1 && this->check == 1 && !moveResolvesTheCheck(r1, c1, r2, c2)) continue;
+		this->escape = 0;
+		this->check = 0;
+
+		try {
+			if (!(*this->board[r1])[c1]->moveCheck(r2, c2, this->board) || (*this->board[r1])[c1] == nullptr || (*this->board[r1])[c1]->isWhite != this->turn) {
+				throw invalid_argument("move is not valid!");
+			}
 			(*this->board[r2])[c2] = (*this->board[r1])[c1];
+			(*this->board[r2])[c2]->row = r2, (*this->board[r2])[c2]->col = c2;
 			(*this->board[r1])[c1] = nullptr;
+			cout << "you made your move " << turnIndicator << "\n\n";
 		}
-		else if (!(*this->board[r1])[c1]->moveCheck(r2, c2, this->board)) {
-			cout << "invalid input try again!" << endl;
+		catch (const exception& e) {
+			cout << "Invalid input, try again!" << endl;
 			continue;
 		}
-			cout << "you made your move " << turnIndicator << "\n\n";
-		checkTheKing();
+
+		gameStatus();
 		this->turn = !this->turn;
 	}
-	cout << "Game Over";
+	cout << "Game Over";	
 }
 
-	// delete this !
-//void test() {
-//	// Creates the board.
-//	LinkedList<LinkedList<Piece*>*> board;
-//	for (int i = 0; i < 8; i++) {
-//		LinkedList<Piece*>* newElement = new LinkedList<Piece*>;
-//		board.insert(newElement);
-//	}
-//	for (int i = 0; i < 8; i++) {
-//		for (int j = 0; j < 8; j++) {
-//			board[i]->insert(new Piece(i, j, 1, ""));
-//			(*board[i])[j] = nullptr;
-//		}
-//	}
-//
-//	// Adds Pieces
-//	(*board[7])[4] = (new King(7, 4, 1, "King"));
-//	cout << (*board[7])[4]->name;
-//	(*board[7])[4]->moveCheck(6, 4, board);
-//
-//	(*board[7])[0] = (new Rook(7, 0, 1, "Rook"));
-//	cout << (*board[7])[0]->name;
-//	(*board[7])[0]->moveCheck(7, 1, board);
-//
-//	(*board[1])[1] = (new Pawn(1, 1, 1, "Pawn"));
-//	cout << (*board[1])[1]->name;
-//	(*board[1])[1]->moveCheck(2, 1, board);
-//
-//	(*board[6])[6] = (new Bishop(6, 6, 1, "Bishop"));
-//	cout << (*board[6])[6]->name;
-//	(*board[6])[6]->moveCheck(5, 7, board);
-//
-//	(*board[5])[5] = (new Queen(5, 5, 1, "Queen"));
-//	cout << (*board[5])[5]->name;
-//	(*board[5])[5]->moveCheck(5, 4, board);
-//
-//	(*board[0])[0] = (new Knight(0, 0, 1, "Knight"));
-//	cout << (*board[0])[0]->name;
-//	(*board[0])[0]->moveCheck(1, 2, board);
-//}
-//
+void Game::print() {
+
+	for (int i = 0; i < 8; i++) {
+		cout << 8 - i << "|" << " ";
+		for (int j = 0; j < 8; j++) {
+			Piece* piece = (*this->board[i])[j];
+			if (piece == nullptr) {
+				cout << ". ";
+			}
+			else {
+				char pieceChar = ' ';
+				if (piece->name == "Pawn") pieceChar = 'P';
+				else if (piece->name == "Rook") pieceChar = 'R';
+				else if (piece->name == "Knight") pieceChar = 'N';
+				else if (piece->name == "Bishop") pieceChar = 'B';
+				else if (piece->name == "Queen") pieceChar = 'Q';
+				else if (piece->name == "King") pieceChar = 'K';
+				if (!piece->isWhite) {
+					pieceChar = tolower(pieceChar);
+				}
+
+				cout << pieceChar << ' ';
+			}
+		}
+		cout << endl;
+	}
+	cout << " " << " " << " a b c d e f g h\n";
+
+}

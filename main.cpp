@@ -43,7 +43,6 @@ void test() {
 }
 
 
-// alt taraf this->isWhite == 0 yani black ama white olmasý lazým print den bul.
 int main() {
 	Game g1;
 	g1.play();
@@ -51,6 +50,4 @@ int main() {
 	return 0;
 }
 
-// //Derefrence the pointers you handle before you orint otherwise you may have troubles due to swallow copies.
-//cout << (*(board[0]))[2].col;
 

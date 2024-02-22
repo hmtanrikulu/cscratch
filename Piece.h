@@ -25,8 +25,7 @@ public:
 	LinkedList<Move>moveSet;
 	Piece(int, int, bool, string);
 
-	// string& n try that in order to obeserve the flow of inheritance
-	virtual bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>);
+	virtual bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>&);
 
 	// Conditions for moveCheck
 	bool isInMoveSet(int, int);
@@ -39,7 +38,7 @@ public:
 class King : public Piece {
 public:
 	bool isMoved;
-	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>&) override;
 	bool isCastle(int, int);
 	bool isRookMoved(int, int, LinkedList<LinkedList<Piece*>*>);
 	bool isDumbMove(int, int, LinkedList<LinkedList<Piece*>*>);
@@ -49,33 +48,33 @@ public:
 class Rook : public Piece {
 public:
 	bool isMoved;
-	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>&) override;
 	Rook(int, int, bool, const string&);
 };
 
 class Knight :public Piece {
 public:
 	Knight(int, int, bool, const string&);
-	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>&) override;
 };
 
 class Bishop :public Piece {
 public:
 	Bishop(int, int, bool, const string&);
-	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>&) override;
 };
 
 class Queen :public Piece {
 public:
 	Queen(int, int, bool, const string&);
-	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>&) override;
 };
 
 class Pawn :public Piece {
 public:
 	bool isMoved;
 	Pawn(int, int, bool, const string&);
-	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>) override;
+	bool moveCheck(int, int, LinkedList<LinkedList<Piece*>*>&) override;
 	bool isInterrupted(int, int, LinkedList<LinkedList<Piece*>*>);
 	bool crossMove(int, int, LinkedList<LinkedList<Piece*>*>);
 	void convert(int, int, LinkedList<LinkedList<Piece*>*>);

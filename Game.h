@@ -3,11 +3,14 @@
 class Game {
 	bool turn;
 	bool finish;
+	bool check;
+	bool escape;
 	LinkedList<LinkedList<Piece*>*> board;
 public:
+	bool isKingInCheck();
 	void play();
-	void checkTheKing();
 	void print();
-	//void initilizeTheBoard();
+	bool moveResolvesTheCheck(int, int, int, int);
+	void gameStatus();
 	Game();
 };

@@ -1,2 +1,4 @@
-﻿  Piece.cpp
+﻿  Game.cpp
+C:\Users\hmert\source\repos\scratch\scratch\Game.cpp(155,27): warning C4101: 'e': unreferenced local variable
+Debug\Game.obj : warning LNK4042: object specified more than once; extras ignored
   scratch.vcxproj -> C:\Users\hmert\source\repos\scratch\Debug\scratch.exe
